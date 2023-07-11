@@ -1,11 +1,22 @@
 {
   "name": "chess-v3",
   "version": "1.0.0",
+  "private": true,
   "description": "",
   "main": "index.js",
+  "workspaces": [
+    "server"
+  ],
   "scripts": {
+    "dev": "concurrently -n server,client -c green,blue \"npm run dev --prefix client\" \"npm run dev -w server\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
 }
