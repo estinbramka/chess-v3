@@ -4,12 +4,18 @@ import React, { FormEvent } from "react";
 import Image from 'next/image'
 import signIn from '@/firebase/auth/signin';
 import Link from 'next/link';
+import { useAuthContext } from '@/context/AuthContext';
 
 export default function Page() {
     const [email, setEmail] = React.useState('')
     const [password, setPassword] = React.useState('')
     const [errorMessage, setErrorMessage] = React.useState('')
     const router = useRouter()
+    const {user} = useAuthContext();
+    
+    if (user) {
+        return router.push("/")
+    }
 
     async function handleForm(event: FormEvent) {
         event.preventDefault()
@@ -23,7 +29,7 @@ export default function Page() {
 
         // else successful
         console.log(result)
-        return router.push("/admin")
+        return router.push("/")
     }
 
     return (
