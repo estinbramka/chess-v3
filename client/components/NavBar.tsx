@@ -4,6 +4,7 @@ import { Bars3Icon, BellIcon, XMarkIcon, UserIcon } from '@heroicons/react/24/ou
 import Image from 'next/image'
 import Link from 'next/link'
 import signOut from '@/firebase/auth/signout'
+import { useAuthContext } from '@/context/AuthContext'
 
 const navigation = [
     { name: 'Home', href: '#', current: true },
@@ -17,15 +18,16 @@ function classNames(...classes: string[]) {
 }
 
 export default function NavBar() {
-    
-    async function handleSignOut(){
+    const { user } = useAuthContext();
+
+    async function handleSignOut() {
         const { result, error } = await signOut();
-        if(error){
+        if (error) {
             alert(error);
             return;
         }
         console.log(result);
-        return 
+        return
     }
 
     return (
@@ -124,6 +126,19 @@ export default function NavBar() {
                                                     </Link>
                                                 )}
                                             </Menu.Item>
+                                            {
+                                                user?.isAnonymous &&
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <Link
+                                                            href="/signup/upgrade"
+                                                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                                                        >
+                                                            Register Account
+                                                        </Link>
+                                                    )}
+                                                </Menu.Item>
+                                            }
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <Link

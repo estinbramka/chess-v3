@@ -1,5 +1,5 @@
 'use client'
-import signUp from '@/firebase/auth/signup';
+import signUp, { signUpAnonymous } from '@/firebase/auth/signup';
 import { useRouter } from 'next/navigation'
 import React, { FormEvent } from "react";
 import Image from 'next/image'
@@ -15,7 +15,10 @@ export default function Page() {
     const { user } = useAuthContext();
 
     React.useEffect(() => {
-        if (user) {
+        if (user === null) {
+            return router.push("/signup")
+        }
+        else if (user.isAnonymous === false) {
             return router.push("/")
         }
     }, [user])
@@ -29,7 +32,7 @@ export default function Page() {
             return;
         }
 
-        const { result, error } = await signUp(email, password);
+        const { result, error } = await signUpAnonymous(email, password);
 
         if (error) {
             switch (error.code) {
@@ -48,14 +51,14 @@ export default function Page() {
 
         // else successful
         console.log(result)
-        return //router.push("/")
+        return router.push("/")
     }
 
     return (
         <div className="flex h-screen flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <Image className="mx-auto h-10 w-auto" src="/logo/chess-low-resolution-logo-color-on-transparent-background.png" alt="Your Company" width={1000} height={699} />
-                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Register a account</h2>
+                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Register a guest account</h2>
             </div>
 
             <div className={`alert alert-error mt-10 sm:mx-auto sm:w-full sm:max-w-sm ${errorMessage === '' && 'hidden'}`}>
@@ -97,7 +100,7 @@ export default function Page() {
 
                 <p className="mt-10 text-center text-sm text-gray-500">
                     Already have a account?
-                    <Link href="/signin" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Sign in</Link>
+                    <Link href="/" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Home</Link>
                 </p>
             </div>
         </div>
