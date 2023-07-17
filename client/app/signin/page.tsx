@@ -11,11 +11,13 @@ export default function Page() {
     const [password, setPassword] = React.useState('')
     const [errorMessage, setErrorMessage] = React.useState('')
     const router = useRouter()
-    const {user} = useAuthContext();
-    
-    if (user) {
-        return router.push("/")
-    }
+    const { user } = useAuthContext();
+
+    React.useEffect(() => {
+        if (user) {
+            return router.push("/")
+        }
+    }, [user])
 
     async function handleForm(event: FormEvent) {
         event.preventDefault()
