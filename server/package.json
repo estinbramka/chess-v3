@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "start": "node ./dist/server.js",
-    "build": "npm install ../types --save-dev && tsc",
+    "build": "tsc",
     "dev": "tsc-watch --noClear --onSuccess \"node ./dist/server.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
