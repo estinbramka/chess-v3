@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "workspaces": [
-    "server"
+    "server",
+    "types"
   ],
   "scripts": {
     "build:server": "npm run build --prefix server",
