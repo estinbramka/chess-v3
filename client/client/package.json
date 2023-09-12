@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@chessu/types": "file:../../types"
+  }
+}

@@ -4,28 +4,15 @@ import { useAuthContext } from "@/context/AuthContext"
 import { useRouter } from 'next/navigation'
 import React from "react";
 import { API_URL } from "@/config";
+import CreateGame from "@/components/home/CreateGame";
+import JoinGame from "@/components/home/JoinGame";
+import PublicGames from "@/components/home/PublicGames/PublicGames";
+
+export const revalidate = 0;
 
 export default function Home() {
   const router = useRouter()
   const { user } = useAuthContext();
-  const [test, setTest] = React.useState('');
-  //fetch(`${API_URL}/v1/games/helloworld`).then(res => res.json()).then(res => console.log(res));
-
-  React.useEffect(()=>{
-    async function fetchData() {
-      const token = await user?.getIdToken()
-      const response = await fetch(`${API_URL}/v1/games/helloworld`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      const result = await response.json()
-      setTest(JSON.stringify(result))
-      console.log(result);
-    }
-    fetchData();
-  },[])
 
   React.useEffect(() => {
     if (user === null) {
@@ -34,10 +21,25 @@ export default function Home() {
   }, [user])
 
   return (
-    <div>
+    <div className="min-h-screen">
       <NavBar />
-      <div>hello {JSON.stringify(user)}</div>
-      <div>test {test}</div>
+      <div className="flex w-full flex-wrap items-center justify-center gap-8 px-4 py-10 lg:gap-16 ">
+        <PublicGames />
+
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center">
+            <h2 className="mb-4 text-xl font-bold leading-tight">Join from invite</h2>
+            <JoinGame />
+          </div>
+
+          <div className="divider divider-vertical">or</div>
+
+          <div className="flex flex-col items-center">
+            <h2 className="mb-4 text-xl font-bold leading-tight">Create game</h2>
+            <CreateGame />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

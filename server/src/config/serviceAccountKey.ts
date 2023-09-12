@@ -1,3 +1,5 @@
 import "dotenv/config";
 
-module.exports = JSON.parse(process.env.SERVICE_ACCOUNT_KEY!);
+const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY!);
+
+export default serviceAccount

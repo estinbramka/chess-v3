@@ -3,7 +3,7 @@ import { createServer } from "http";
 import cors from "cors";
 
 import routes from "./routes/index.js";
-const middleware = require('./middleware/index.js');
+import middleware from './middleware/index.js';
 
 const corsConfig = {
     origin: process.env.CORS_ORIGIN || "http://localhost:3000",

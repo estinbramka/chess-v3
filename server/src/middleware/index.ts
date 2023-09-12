@@ -1,11 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
 
-const admin = require('../config/firebase-config');
+import admin from '../config/firebase-config.js';
 class Middleware {
     async decodeToken(req: Request, res: Response, next: NextFunction) {
         const token = req.headers.authorization?.split(' ')[1];
         try {
-            const decodeValue = await admin.auth().verifyIdToken(token);
+            const decodeValue = await admin.auth().verifyIdToken(token!);
             if (decodeValue) {
                 //console.log(decodeValue);
                 req.user = decodeValue;
@@ -17,4 +17,6 @@ class Middleware {
         }
     }
 }
-module.exports = new Middleware();
+const middleware = new Middleware();
+
+export default middleware;
