@@ -7,6 +7,7 @@ import { API_URL } from "@/config";
 import CreateGame from "@/components/home/CreateGame";
 import JoinGame from "@/components/home/JoinGame";
 import PublicGames from "@/components/home/PublicGames/PublicGames";
+import AuthModal from "@/components/auth/AuthModal";
 
 export const revalidate = 0;
 
@@ -40,6 +41,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <AuthModal/>
     </div>
   )
 }

@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import { nanoid } from "nanoid";
 
 import GameModel, { activeGames } from "../db/models/game.model.js";
+import UserModel from "../db/models/user.model.js";
 
 export const getGames = async (req: Request, res: Response) => {
     try {
@@ -73,9 +74,15 @@ export const createGame = async (req: Request, res: Response) => {
             res.status(401).end();
             return;
         }
+        const userdb = await UserModel.findById(req.user.uid)
+        if (!userdb?.name) {
+            console.log("unauthorized createGame");
+            res.status(401).end();
+            return;
+        }
         const user: User = {
             id: req.user.uid,
-            name: req.user.email,//get the name
+            name: userdb?.name,
             connected: false
         };
         const unlisted: boolean = req.body.unlisted ?? false;

@@ -4,10 +4,9 @@ export const db = new pg.Pool();
 
 export const INIT_TABLES = /* sql */ `
     CREATE TABLE IF NOT EXISTS "user" (
-        id SERIAL PRIMARY KEY,
+        id VARCHAR(128) PRIMARY KEY,
         name VARCHAR(128) UNIQUE NOT NULL,
         email VARCHAR(128),
-        password TEXT,
         wins INTEGER DEFAULT 0,
         losses INTEGER DEFAULT 0,
         draws INTEGER DEFAULT 0,
@@ -18,9 +17,9 @@ export const INIT_TABLES = /* sql */ `
         winner VARCHAR(5),
         end_reason VARCHAR(16),
         pgn TEXT,
-        white_id INT REFERENCES "user",
+        white_id VARCHAR(128) REFERENCES "user",
         white_name VARCHAR(32),
-        black_id INT REFERENCES "user",
+        black_id VARCHAR(128) REFERENCES "user",
         black_name VARCHAR(32),
         started_at TIMESTAMP NOT NULL,
         ended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
