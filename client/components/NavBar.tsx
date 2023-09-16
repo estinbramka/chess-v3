@@ -8,7 +8,7 @@ import { useAuthContext } from '@/context/AuthContext'
 import React from 'react'
 
 const navigationArray = [
-    { name: 'Home', href: '/', current: window.location.pathname === '/' },
+    { name: 'Home', href: '/', current: true },
     { name: 'Team', href: '#', current: false },
     { name: 'Projects', href: '#', current: false },
     { name: 'Calendar', href: '#', current: false },
@@ -24,7 +24,7 @@ export default function NavBar() {
 
     React.useEffect(() => {
         setNavigation([
-            { name: 'Home', href: '/', current: window.location.pathname === '/' },
+            { name: 'Home', href: '/', current: true },
             { name: 'Team', href: '#', current: false },
             { name: 'Projects', href: '#', current: false },
             { name: 'Calendar', href: '#', current: false },
