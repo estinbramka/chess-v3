@@ -5,9 +5,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import signOut from '@/firebase/auth/signout'
 import { useAuthContext } from '@/context/AuthContext'
+import React from 'react'
 
-const navigation = [
-    { name: 'Home', href: '#', current: true },
+const navigationArray = [
+    { name: 'Home', href: '/', current: window.location.pathname === '/' },
     { name: 'Team', href: '#', current: false },
     { name: 'Projects', href: '#', current: false },
     { name: 'Calendar', href: '#', current: false },
@@ -19,6 +20,16 @@ function classNames(...classes: string[]) {
 
 export default function NavBar() {
     const { user } = useAuthContext();
+    const [navigation, setNavigation] = React.useState<{ name: string; href: string; current: boolean; }[]>(navigationArray);
+
+    React.useEffect(() => {
+        setNavigation([
+            { name: 'Home', href: '/', current: window.location.pathname === '/' },
+            { name: 'Team', href: '#', current: false },
+            { name: 'Projects', href: '#', current: false },
+            { name: 'Calendar', href: '#', current: false },
+        ]);
+    }, [])
 
     async function handleSignOut() {
         const { result, error } = await signOut();

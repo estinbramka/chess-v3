@@ -21,9 +21,14 @@ export const createGame = async (side: string, unlisted: boolean, token: string)
     }
 };
 
-export const fetchActiveGame = async (code: string) => {
+export const fetchActiveGame = async (code: string, token: string | undefined) => {
     try {
-        const res = await fetch(`${API_URL}/v1/games/${code}`, { cache: "no-store" });
+        const res = await fetch(`${API_URL}/v1/games/${code}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         if (res && res.status === 200) {
             const game: Game = await res.json();
