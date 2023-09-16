@@ -32,7 +32,7 @@ export default function JoinGame() {
             code = new URL(code).pathname.split("/")[1];
         }
 
-        const game = await fetchActiveGame(code);
+        const game = await fetchActiveGame(code, await user?.getIdToken());
 
         if (game && game.code) {
             router.push(`/${game.code}`);
