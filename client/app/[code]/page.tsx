@@ -10,9 +10,11 @@ import NavBar from "@/components/NavBar";
 export default function Game({ params }: { params: { code: string } }) {
     const { user } = useAuthContext();
     const [game, setGame] = React.useState<Game | undefined | null>(null);
+    const token = React.useRef<string | undefined>();
     React.useEffect(() => {
         async function fetchData() {
-            const fetchGame = await fetchActiveGame(params.code, await user?.getIdToken());
+            token.current = await user?.getIdToken();
+            const fetchGame = await fetchActiveGame(params.code, token.current);
             setGame(fetchGame);
         }
         fetchData();
@@ -31,7 +33,7 @@ export default function Game({ params }: { params: { code: string } }) {
         return (
             <div className="min-h-screen">
                 <NavBar />
-                <GameAuthWrapper initialLobby={game} />
+                <GameAuthWrapper initialLobby={game} token={token.current} />
             </div>
         )
     }

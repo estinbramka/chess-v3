@@ -6,8 +6,8 @@ import { useContext } from "react";
 
 import GamePage from "./GamePage";
 
-export default function GameAuthWrapper({ initialLobby }: { initialLobby: Game }) {
-    const { user } = useAuthContext();
+export default function GameAuthWrapper({ initialLobby, token }: { initialLobby: Game, token: string | undefined }) {
+  const { user } = useAuthContext();
 
   if (!user || !user?.uid) {
     return (
@@ -18,5 +18,5 @@ export default function GameAuthWrapper({ initialLobby }: { initialLobby: Game }
     );
   }
 
-  return <GamePage initialLobby={initialLobby} />;
+  return <GamePage initialLobby={initialLobby} token={token} />;
 }

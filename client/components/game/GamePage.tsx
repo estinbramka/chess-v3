@@ -29,10 +29,12 @@ import { lobbyReducer, squareReducer } from "./reducers";
 import { initSocket } from "./socketEvents";
 import { syncPgn, syncSide } from "./utils";
 
-const socket = io(API_URL, { withCredentials: true, autoConnect: false });
+//const socket = io(API_URL, { auth: { token: user }, autoConnect: false });
 
-export default function GamePage({ initialLobby }: { initialLobby: Game }) {
+export default function GamePage({ initialLobby, token }: { initialLobby: Game, token: string | undefined }) {
     const { user } = useAuthContext();
+    const { current: socket } = useRef(io(API_URL, { auth: { token: token }, autoConnect: false }));
+    //socket = io(API_URL, { auth: { token: token }, autoConnect: false });
 
     const [lobby, updateLobby] = useReducer(lobbyReducer, {
         ...initialLobby,
@@ -426,7 +428,7 @@ export default function GamePage({ initialLobby }: { initialLobby: Game }) {
             .slice(history.length / 2)
             .map((_: any, i: number) => history.slice((i *= 2), i + 2));
 
-        return movePairs.map((moves , i: number) => {
+        return movePairs.map((moves, i: number) => {
             return (
                 <tr className="flex w-full items-center gap-1" key={i + 1}>
                     <td className="">{i + 1}.</td>
