@@ -403,6 +403,12 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
         return true;
     }
 
+    function onPromotionCheck(sourceSquare: Square, targetSquare: Square, piece: Piece): boolean {
+        setMoveFrom(sourceSquare)
+        setMoveTo(targetSquare)
+        return ((piece === "wP" && sourceSquare[1] === "7" && targetSquare[1] === "8") || (piece === "bP" && sourceSquare[1] === "2" && targetSquare[1] === "1")) && Math.abs(sourceSquare.charCodeAt(0) - targetSquare.charCodeAt(0)) <= 1
+    }
+
     function onSquareRightClick(square: Square) {
         const colour = "rgba(0, 0, 255, 0.4)";
         updateCustomSquares({
@@ -624,6 +630,7 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
                     showPromotionDialog={showPromotionDialog}
                     promotionToSquare={moveTo}
                     onPromotionPieceSelect={onPromotionPieceSelect}
+                    onPromotionCheck={onPromotionCheck}
                     customSquareStyles={{
                         ...(navIndex === null ? customSquares.lastMove : getNavMoveSquares()),
                         ...(navIndex === null ? customSquares.check : {}),
