@@ -28,6 +28,7 @@ import { io } from "socket.io-client";
 import { lobbyReducer, squareReducer } from "./reducers";
 import { initSocket } from "./socketEvents";
 import { syncPgn, syncSide } from "./utils";
+import { Piece, PromotionPieceOption } from "react-chessboard/dist/chessboard/types";
 
 //const socket = io(API_URL, { auth: { token: user }, autoConnect: false });
 
@@ -35,6 +36,8 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
     const { user } = useAuthContext();
     const { current: socket } = useRef(io(API_URL, { auth: { token: token }, autoConnect: false }));
     //socket = io(API_URL, { auth: { token: token }, autoConnect: false });
+
+    const [showPromotionDialog, setShowPromotionDialog] = useState(true);
 
     const [lobby, updateLobby] = useReducer(lobbyReducer, {
         ...initialLobby,
@@ -49,7 +52,8 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
         check: {}
     });
 
-    const [moveFrom, setMoveFrom] = useState<string | Square | null>(null);
+    const [moveFrom, setMoveFrom] = useState<Square | string | null>("");
+    const [moveTo, setMoveTo] = useState<Square | null>(null);
     const [boardWidth, setBoardWidth] = useState(480);
     const chessboardRef = useRef<ClearPremoves>(null);
 
@@ -251,7 +255,7 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
         return piece.startsWith(lobby.side) && !lobby.endReason && !lobby.winner;
     }
 
-    function onDrop(sourceSquare: Square, targetSquare: Square) {
+    function onDrop(sourceSquare: Square, targetSquare: Square, piece: Piece) {
         if (lobby.side === "s" || navFen || lobby.endReason || lobby.winner) return false;
 
         // premove
@@ -260,7 +264,7 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
         const moveDetails = {
             from: sourceSquare,
             to: targetSquare,
-            promotion: "q"
+            promotion: piece[1].toLowerCase() ?? "q"
         };
 
         const move = makeMove(moveDetails);
@@ -275,7 +279,7 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
             verbose: true
         }) as Move[];
         if (moves.length === 0) {
-            return;
+            return false;
         }
 
         const newSquares: {
@@ -296,6 +300,7 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
             background: "rgba(255, 255, 0, 0.4)"
         };
         updateCustomSquares({ options: newSquares });
+        return true;
     }
 
     function onPieceDragBegin(_piece: string, sourceSquare: Square) {
@@ -323,19 +328,79 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
             return;
         }
 
-        const moveDetails = {
-            from: moveFrom,
-            to: square,
-            promotion: "q"
-        };
+        // to square
+        if (!moveTo) {
+            // check if valid move before showing dialog
+            const moves = lobby.actualGame.moves({
+                square: moveFrom as Square,
+                verbose: true,
+            });
+            const foundMove = moves.find(
+                (m) => m.from === moveFrom && m.to === square
+            );
+            // not a valid move
+            if (!foundMove) {
+                // check if clicked on new piece
+                const hasMoveOptions = getMoveOptions(square);
+                // if new piece, setMoveFrom, otherwise clear moveFrom
+                setMoveFrom(hasMoveOptions ? square : "");
+                return;
+            }
 
-        const move = makeMove(moveDetails);
-        if (!move) {
-            resetFirstMove(square);
-        } else {
-            setMoveFrom(null);
-            socket.emit("sendMove", moveDetails);
+            // valid move
+            setMoveTo(square);
+
+            // if promotion move
+            if (
+                (foundMove.color === "w" &&
+                    foundMove.piece === "p" &&
+                    square[1] === "8") ||
+                (foundMove.color === "b" &&
+                    foundMove.piece === "p" &&
+                    square[1] === "1")
+            ) {
+                setShowPromotionDialog(true);
+                return;
+            }
+
+            // is normal move
+            const moveDetails = {
+                from: moveFrom,
+                to: square,
+                promotion: "q"
+            };
+
+            const move = makeMove(moveDetails);
+            if (!move) {
+                resetFirstMove(square);
+            } else {
+                setMoveFrom(null);
+                setMoveTo(null);
+                socket.emit("sendMove", moveDetails);
+            }
         }
+    }
+
+    function onPromotionPieceSelect(piece?: PromotionPieceOption | undefined) {
+        // if no piece passed then user has cancelled dialog, don't make move and reset
+        if (piece) {
+            const moveDetails = {
+                from: moveFrom as string,
+                to: moveTo as string,
+                promotion: piece[1].toLowerCase() ?? "q"
+            };
+            const move = makeMove(moveDetails);
+            if (move) {
+                setMoveFrom(null);
+                setMoveTo(null);
+                socket.emit("sendMove", moveDetails);
+            }
+        }
+
+        setMoveFrom("");
+        setMoveTo(null);
+        setShowPromotionDialog(false);
+        return true;
     }
 
     function onSquareRightClick(square: Square) {
@@ -556,6 +621,9 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
                     onSquareClick={onSquareClick}
                     onSquareRightClick={onSquareRightClick}
                     arePremovesAllowed={!navFen}
+                    showPromotionDialog={showPromotionDialog}
+                    promotionToSquare={moveTo}
+                    onPromotionPieceSelect={onPromotionPieceSelect}
                     customSquareStyles={{
                         ...(navIndex === null ? customSquares.lastMove : getNavMoveSquares()),
                         ...(navIndex === null ? customSquares.check : {}),
