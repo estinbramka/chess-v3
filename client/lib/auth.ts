@@ -96,16 +96,16 @@ export const logout = async () => {
     }
 };
 
-export const updateUser = async (name?: string, email?: string, password?: string) => {
+export const updateUser = async (name?: string, email?: string | null, token?: string) => {
     try {
-        if (!name && !email && !password) return;
+        if (!name && !email && !token) return;
         const res = await fetch(`${API_URL}/v1/auth/`, {
             method: "PATCH",
-            credentials: "include",
             headers: {
+                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ name, email, password })
+            body: JSON.stringify({ name, email })
         });
         if (res.status === 200) {
             const user: User = await res.json();

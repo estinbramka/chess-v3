@@ -4,7 +4,7 @@ import * as controller from "../controllers/auth.controller.js";
 
 const router = Router();
 
-router.route("/").get(controller.getCurrentSession)//.patch(controller.updateUser);
+router.route("/").get(controller.getCurrentSession).patch(controller.updateUser);
 
 // create or update guest sessions
 //router.route("/guest").post(controller.guestSession);

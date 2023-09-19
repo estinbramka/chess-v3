@@ -5,6 +5,7 @@ import React, { FormEvent } from "react";
 import Image from 'next/image'
 import Link from 'next/link';
 import { useAuthContext } from '@/context/AuthContext';
+import { updateUser } from '@/lib/auth';
 
 export default function Page() {
     const [email, setEmail] = React.useState('')
@@ -32,6 +33,7 @@ export default function Page() {
         }
 
         // else successful
+        updateUser(undefined, result?.user.email, await result?.user.getIdToken());
         console.log(result)
         return router.push("/")
     }
@@ -63,6 +65,7 @@ export default function Page() {
         }
 
         // else successful
+        updateUser(undefined, result?.user.email, await result?.user.getIdToken())
         console.log(result)
         return router.push("/")
     }

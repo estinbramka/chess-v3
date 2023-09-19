@@ -109,7 +109,7 @@ export default function Page() {
                     Not a member?
                     <Link href="/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Sign up</Link>
                     OR
-                    <Link href="#" onClick={handleGuest} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Continie as Guest</Link>
+                    <Link href="#" onClick={handleGuest} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Continue as Guest</Link>
                 </p>
             </div>
         </div>
