@@ -52,7 +52,7 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
         check: {}
     });
 
-    const [moveFrom, setMoveFrom] = useState<Square | string | null>("");
+    const [moveFrom, setMoveFrom] = useState<Square | null>(null);
     const [moveTo, setMoveTo] = useState<Square | null>(null);
     const [boardWidth, setBoardWidth] = useState(480);
     const chessboardRef = useRef<ClearPremoves>(null);
@@ -259,7 +259,11 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
         if (lobby.side === "s" || navFen || lobby.endReason || lobby.winner) return false;
 
         // premove
-        if (lobby.side !== lobby.actualGame.turn()) return true;
+        if (lobby.side !== lobby.actualGame.turn()) {
+            setMoveFrom(null);
+            setMoveTo(null);
+            return true;
+        }
 
         const moveDetails = {
             from: sourceSquare,
@@ -270,6 +274,8 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
         const move = makeMove(moveDetails);
         if (!move) return false; // illegal move
         socket.emit("sendMove", moveDetails);
+        setMoveFrom(null);
+        setMoveTo(null);
         return true;
     }
 
@@ -343,7 +349,7 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
                 // check if clicked on new piece
                 const hasMoveOptions = getMoveOptions(square);
                 // if new piece, setMoveFrom, otherwise clear moveFrom
-                setMoveFrom(hasMoveOptions ? square : "");
+                setMoveFrom(hasMoveOptions ? square : null);
                 return;
             }
 
@@ -397,16 +403,21 @@ export default function GamePage({ initialLobby, token }: { initialLobby: Game, 
             }
         }
 
-        setMoveFrom("");
+        setMoveFrom(null);
         setMoveTo(null);
         setShowPromotionDialog(false);
         return true;
     }
 
     function onPromotionCheck(sourceSquare: Square, targetSquare: Square, piece: Piece): boolean {
-        setMoveFrom(sourceSquare)
-        setMoveTo(targetSquare)
-        return ((piece === "wP" && sourceSquare[1] === "7" && targetSquare[1] === "8") || (piece === "bP" && sourceSquare[1] === "2" && targetSquare[1] === "1")) && Math.abs(sourceSquare.charCodeAt(0) - targetSquare.charCodeAt(0)) <= 1
+        const promotionState = ((piece === "wP" && sourceSquare[1] === "7" && targetSquare[1] === "8") || (piece === "bP" && sourceSquare[1] === "2" && targetSquare[1] === "1")) && Math.abs(sourceSquare.charCodeAt(0) - targetSquare.charCodeAt(0)) <= 1
+        if (sourceSquare !== targetSquare) {
+            setMoveFrom(sourceSquare)
+            setMoveTo(targetSquare)
+            setShowPromotionDialog(promotionState)
+            //console.log(moveFrom, moveTo, promotionState)
+        }
+        return promotionState
     }
 
     function onSquareRightClick(square: Square) {
